@@ -1,0 +1,27 @@
+{
+  "name": "soulmd",
+  "private": true,
+  "packageManager": "pnpm@10.29.3",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "pnpm --filter @soulmd/api dev",
+    "dev:web": "pnpm --filter @soulmd/web dev",
+    "test": "turbo run test",
+    "test:e2e": "vitest run e2e.test.ts",
+    "lint": "turbo run lint"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "workerd"
+    ]
+  },
+  "devDependencies": {
+    "@libsql/client": "^0.17.0",
+    "hono": "^4.11.9",
+    "tsx": "^4.19.0",
+    "turbo": "^2.4.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}

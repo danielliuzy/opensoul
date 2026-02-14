@@ -1,0 +1,17 @@
+name = "soulmd-api"
+main = "src/worker.ts"
+compatibility_date = "2024-12-01"
+
+[vars]
+# Non-secret vars can go here
+
+# Secrets (set via `wrangler secret put`):
+# TURSO_DATABASE_URL
+# TURSO_AUTH_TOKEN
+# R2_ENDPOINT
+# R2_ACCESS_KEY_ID
+# R2_SECRET_ACCESS_KEY
+# R2_BUCKET
+# GITHUB_CLIENT_ID
+# GITHUB_CLIENT_SECRET
+# JWT_SECRET
