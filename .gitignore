@@ -10,3 +10,4 @@ dist/
 .wrangler/
 .claude/
 PLAN.md
+.DS_Store
