@@ -6,15 +6,19 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
-    "dev": "tsx --watch src/index.ts",
+    "dev": "tsx --env-file .env.local --watch src/index.ts",
     "deploy": "wrangler deploy"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^3.0.29",
     "@aws-sdk/client-s3": "^3.990.0",
     "@hono/node-server": "^1.19.9",
     "@libsql/client": "^0.17.0",
     "@soulmd/core": "workspace:*",
-    "hono": "^4.7.0"
+    "ai": "^6.0.86",
+    "hono": "^4.7.0",
+    "nanoid": "^5.1.6",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260214.0",

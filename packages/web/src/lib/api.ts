@@ -1,4 +1,5 @@
 import type {
+  Soul,
   SoulListResponse,
   SoulDetailResponse,
   RateResponse,
@@ -61,32 +62,68 @@ export function listSouls(params: {
   return apiFetch<SoulListResponse>(`/souls${qs ? `?${qs}` : ""}`);
 }
 
-export function getSoul(slug: string): Promise<SoulDetailResponse> {
-  return apiFetch<SoulDetailResponse>(`/souls/${slug}`);
+export function getSoul(id: string): Promise<SoulDetailResponse> {
+  return apiFetch<SoulDetailResponse>(`/souls/${id}`);
 }
 
-export function getSoulContent(slug: string): Promise<string> {
-  return apiFetch<string>(`/souls/${slug}/content`);
+export function getSoulContent(id: string): Promise<string> {
+  return apiFetch<string>(`/souls/${id}/content`);
 }
 
 export function rateSoul(
-  slug: string,
+  id: string,
   rating: number
 ): Promise<RateResponse> {
-  return apiFetch<RateResponse>(`/souls/${slug}/rate`, {
+  return apiFetch<RateResponse>(`/souls/${id}/rate`, {
     method: "POST",
     body: JSON.stringify({ rating }),
   });
 }
 
-export function uploadSoul(
-  content: string,
-  changelog?: string
-): Promise<UploadResponse> {
+export function uploadSoul(content: string): Promise<UploadResponse> {
   return apiFetch<UploadResponse>("/souls", {
     method: "POST",
-    body: JSON.stringify({ content, changelog }),
+    body: JSON.stringify({ content }),
   });
+}
+
+export function getUser(username: string): Promise<{ id: number; username: string; avatar: string }> {
+  return apiFetch<{ id: number; username: string; avatar: string }>(`/users/${username}`);
+}
+
+export function getUserSouls(
+  username: string,
+  page?: number,
+  limit?: number,
+): Promise<SoulListResponse> {
+  const sp = new URLSearchParams();
+  if (page) sp.set("page", String(page));
+  if (limit) sp.set("limit", String(limit));
+  const qs = sp.toString();
+  return apiFetch<SoulListResponse>(
+    `/users/${username}/souls${qs ? `?${qs}` : ""}`,
+  );
+}
+
+export function updateSoul(
+  id: string,
+  fields: { name?: string; description?: string; label?: string }
+): Promise<Soul> {
+  return apiFetch<Soul>(`/souls/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(fields),
+  });
+}
+
+export function updateSoulContent(id: string, content: string): Promise<{ ok: boolean }> {
+  return apiFetch<{ ok: boolean }>(`/souls/${id}/content`, {
+    method: "PUT",
+    body: JSON.stringify({ content }),
+  });
+}
+
+export function deleteSoul(id: string): Promise<{ ok: boolean }> {
+  return apiFetch<{ ok: boolean }>(`/souls/${id}`, { method: "DELETE" });
 }
 
 export function getLoginUrl(): string {

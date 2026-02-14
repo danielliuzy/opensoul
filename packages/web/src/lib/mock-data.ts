@@ -1,14 +1,15 @@
-import type { Soul, SoulDetailResponse, SoulListResponse } from "./types";
+import type { Soul, SoulListResponse } from "./types";
 
 const MOCK_SOULS: Soul[] = [
   {
     id: 1,
     slug: "senior-typescript-engineer",
+    label: "senior-typescript-engineer",
     name: "Senior TypeScript Engineer",
+    user_id: 1,
     author: "comi",
     description:
       "A meticulous senior engineer who writes clean, type-safe TypeScript with strong opinions on architecture and testing.",
-    version: "1.2.0",
     tags: ["typescript", "engineering", "code-review"],
     rating_avg: 4.8,
     rating_count: 42,
@@ -18,11 +19,12 @@ const MOCK_SOULS: Soul[] = [
   {
     id: 2,
     slug: "creative-writing-coach",
+    label: "creative-writing-coach",
     name: "Creative Writing Coach",
+    user_id: 2,
     author: "elara",
     description:
       "Guides writers through storytelling fundamentals — structure, voice, pacing — with warmth and constructive feedback.",
-    version: "2.0.1",
     tags: ["writing", "creative", "coaching"],
     rating_avg: 4.6,
     rating_count: 31,
@@ -32,11 +34,12 @@ const MOCK_SOULS: Soul[] = [
   {
     id: 3,
     slug: "devops-sre-specialist",
+    label: "devops-sre-specialist",
     name: "DevOps & SRE Specialist",
+    user_id: 3,
     author: "kiran",
     description:
       "Thinks in pipelines, monitors, and incident runbooks. Obsessed with uptime, observability, and infrastructure-as-code.",
-    version: "1.0.0",
     tags: ["devops", "sre", "infrastructure"],
     rating_avg: 4.3,
     rating_count: 18,
@@ -46,11 +49,12 @@ const MOCK_SOULS: Soul[] = [
   {
     id: 4,
     slug: "ux-research-mentor",
+    label: "ux-research-mentor",
     name: "UX Research Mentor",
+    user_id: 4,
     author: "priya",
     description:
       "Helps product teams think through user research methods, interview scripts, and synthesis frameworks.",
-    version: "0.9.0",
     tags: ["ux", "research", "product"],
     rating_avg: 4.1,
     rating_count: 12,
@@ -60,11 +64,12 @@ const MOCK_SOULS: Soul[] = [
   {
     id: 5,
     slug: "rust-systems-programmer",
+    label: "rust-systems-programmer",
     name: "Rust Systems Programmer",
+    user_id: 5,
     author: "oxide",
     description:
       "Writes zero-cost abstractions, thinks about ownership and lifetimes, and explains borrow checker errors with patience.",
-    version: "1.1.0",
     tags: ["rust", "systems", "performance"],
     rating_avg: 4.9,
     rating_count: 55,
@@ -74,11 +79,12 @@ const MOCK_SOULS: Soul[] = [
   {
     id: 6,
     slug: "data-science-analyst",
+    label: "data-science-analyst",
     name: "Data Science Analyst",
+    user_id: 6,
     author: "juno",
     description:
       "Explores datasets methodically — EDA, feature engineering, model selection — and communicates findings clearly.",
-    version: "0.5.0",
     tags: ["data-science", "python", "ml"],
     rating_avg: 3.9,
     rating_count: 8,
@@ -88,11 +94,12 @@ const MOCK_SOULS: Soul[] = [
   {
     id: 7,
     slug: "api-design-reviewer",
+    label: "api-design-reviewer",
     name: "API Design Reviewer",
+    user_id: 1,
     author: "comi",
     description:
       "Reviews REST and GraphQL API designs for consistency, naming conventions, error handling, and developer ergonomics.",
-    version: "1.0.0",
     tags: ["api", "rest", "design"],
     rating_avg: 4.4,
     rating_count: 22,
@@ -102,11 +109,12 @@ const MOCK_SOULS: Soul[] = [
   {
     id: 8,
     slug: "minimalist-product-manager",
+    label: "minimalist-product-manager",
     name: "Minimalist Product Manager",
+    user_id: 7,
     author: "lena",
     description:
       "Ruthlessly prioritizes. Asks 'what can we cut?' before 'what can we add?'. Ships small, measures fast.",
-    version: "0.3.0",
     tags: ["product", "strategy", "lean"],
     rating_avg: 4.7,
     rating_count: 35,
@@ -116,11 +124,12 @@ const MOCK_SOULS: Soul[] = [
   {
     id: 9,
     slug: "security-auditor",
+    label: "security-auditor",
     name: "Security Auditor",
+    user_id: 8,
     author: "zane",
     description:
       "Finds vulnerabilities in code and architecture. Thinks like an attacker, reports like a consultant.",
-    version: "2.1.0",
     tags: ["security", "audit", "appsec"],
     rating_avg: 4.5,
     rating_count: 27,
@@ -130,11 +139,12 @@ const MOCK_SOULS: Soul[] = [
   {
     id: 10,
     slug: "technical-writer",
+    label: "technical-writer",
     name: "Technical Writer",
+    user_id: 9,
     author: "aria",
     description:
       "Turns complex systems into clear documentation. Loves diagrams, examples, and progressive disclosure.",
-    version: "1.0.0",
     tags: ["docs", "writing", "developer-experience"],
     rating_avg: 4.2,
     rating_count: 14,
@@ -146,7 +156,6 @@ const MOCK_SOULS: Soul[] = [
 const MOCK_CONTENT: Record<string, string> = {
   "senior-typescript-engineer": `---
 name: Senior TypeScript Engineer
-version: 1.2.0
 tags: [typescript, engineering, code-review]
 description: A meticulous senior engineer who writes clean, type-safe TypeScript.
 ---
@@ -191,7 +200,6 @@ When reviewing code:
 `,
   "creative-writing-coach": `---
 name: Creative Writing Coach
-version: 2.0.1
 tags: [writing, creative, coaching]
 ---
 
@@ -225,7 +233,6 @@ Voice isn't about vocabulary — it's about rhythm, specificity, and what you ch
 // Default content for souls without specific mock content
 const DEFAULT_CONTENT = `---
 name: Example Soul
-version: 1.0.0
 ---
 
 # SOUL.md
@@ -294,30 +301,9 @@ export function getMockSoulList(params: {
   };
 }
 
-export function getMockSoulDetail(slug: string): SoulDetailResponse | null {
+export function getMockSoulDetail(slug: string): Soul | null {
   const soul = MOCK_SOULS.find((s) => s.slug === slug);
-  if (!soul) return null;
-
-  return {
-    ...soul,
-    versions: {
-      data: [
-        {
-          version: soul.version,
-          content_hash: "abc123def456",
-          changelog: "Latest release",
-          created_at: soul.updated_at,
-        },
-        {
-          version: "0.1.0",
-          content_hash: "000111222333",
-          changelog: "Initial version",
-          created_at: soul.created_at,
-        },
-      ],
-      pagination: { page: 1, limit: 10, total: 2, totalPages: 1 },
-    },
-  };
+  return soul ?? null;
 }
 
 export function getMockSoulContent(slug: string): string {

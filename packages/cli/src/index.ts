@@ -4,7 +4,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { createInterface } from "node:readline";
 import pc from "picocolors";
-import { parseSoulFile } from "@soulmd/core";
+import { createHash } from "node:crypto";
 import { loadConfig, getConfigValue, setConfigValue } from "./config.js";
 import { listCached, getCached, cacheSoul } from "./cache.js";
 import { swapSoul, rollbackSoul, hasBackup, isSwapped, readCurrentSoul, getSoulPath } from "./swap.js";
@@ -126,7 +126,7 @@ program
         source = `cache:${cached.entry.name}`;
         log(`Reading from cache: ${cached.entry.name}`);
       } else {
-        fail(`File not found and not in cache: ${pathOrName}\nTry 'soul pull <slug>' to download from the registry first.`);
+        fail(`File not found and not in cache: ${pathOrName}\nTry 'soul pull <label>' to download from the registry first.`);
       }
     }
 
@@ -167,7 +167,7 @@ program
   .action(() => {
     const cached = listCached();
     if (cached.length === 0) {
-      console.log(pc.yellow("No cached souls. Use 'soul pull <slug>' to download one."));
+      console.log(pc.yellow("No cached souls. Use 'soul pull <label>' to download one."));
       return;
     }
 
@@ -197,20 +197,21 @@ program
 
 // --- pull ---
 program
-  .command("pull <slug>")
-  .description("Pull a soul from the registry and cache it locally")
-  .action(async (slug: string) => {
-    log(`Pulling soul '${slug}' from registry`);
+  .command("pull <label>")
+  .description("Pull a soul from the registry by its label and cache it locally")
+  .action(async (label: string) => {
+    log(`Pulling soul '${label}' from registry`);
     try {
       const client = new RegistryClient();
       log(`Registry URL: ${loadConfig().registry_url}`);
-      const content = await client.getContent(slug);
-      const soul = parseSoulFile(content);
-      const name = soul.frontmatter.name ?? slug;
+      const content = await client.getContent(label);
+      const hash = createHash("sha256").update(content).digest("hex");
+      const headingMatch = content.match(/^#\s+(.+)$/m);
+      const name = headingMatch ? headingMatch[1].replace(/^SOUL\.md\s*[-–—]\s*/i, "").trim() : label;
 
-      cacheSoul(name, content, soul.hash);
+      cacheSoul(name, content, hash);
 
-      console.log(pc.green(`\n✓ Pulled ${pc.bold(name)} (${slug})`));
+      console.log(pc.green(`\n✓ Pulled ${pc.bold(name)} (${label})`));
       console.log(pc.dim(`  Cached locally. Use 'soul swap ${name}' to activate.`));
     } catch (err) {
       fail((err as Error).message);
@@ -244,7 +245,7 @@ program
             ? pc.yellow(` ★ ${soul.rating_avg.toFixed(1)}`) + pc.dim(` (${soul.rating_count} ratings)`)
             : "";
           const desc = soul.description ? pc.dim(` — ${soul.description}`) : "";
-          console.log(`  ${pc.cyan(pc.bold(soul.slug))} ${pc.dim(`v${soul.version}`)} ${pc.magenta(`by ${soul.author}`)}${rating}${desc}`);
+          console.log(`  ${pc.cyan(pc.bold(soul.label))} ${pc.magenta(`by ${soul.author}`)}${rating}${desc}`);
         }
         return;
       }
@@ -257,32 +258,32 @@ program
           ? pc.yellow(` ★ ${soul.rating_avg.toFixed(1)}`) + pc.dim(` (${soul.rating_count})`)
           : "";
         const author = pc.magenta(`by ${soul.author}`);
-        const ver = pc.dim(`v${soul.version}`);
         const desc = soul.description ? pc.dim(` — ${soul.description}`) : "";
         return {
-          name: `${pc.cyan(pc.bold(soul.slug))} ${ver} ${author}${rating}${desc}`,
-          value: soul.slug,
+          name: `${pc.cyan(pc.bold(soul.label))} ${author}${rating}${desc}`,
+          value: soul.label,
         };
       });
 
       console.log(pc.bold(`\n${pagination.total} soul(s) found:\n`));
 
-      const slug = await select({
+      const label = await select({
         message: "Select a soul to pull",
         choices: [...choices, { name: pc.dim("Cancel"), value: "__cancel__" }],
       });
 
-      if (slug === "__cancel__") {
+      if (label === "__cancel__") {
         return;
       }
 
       // Pull the selected soul
-      log(`Pulling soul '${slug}' from registry`);
-      const content = await client.getContent(slug);
-      const soul = parseSoulFile(content);
-      const name = soul.frontmatter.name ?? slug;
-      cacheSoul(name, content, soul.hash);
-      console.log(pc.green(`\n✓ Pulled ${pc.bold(name)} (${slug})`));
+      log(`Pulling soul '${label}' from registry`);
+      const content = await client.getContent(label);
+      const hash = createHash("sha256").update(content).digest("hex");
+      const headingMatch = content.match(/^#\s+(.+)$/m);
+      const name = headingMatch ? headingMatch[1].replace(/^SOUL\.md\s*[-–—]\s*/i, "").trim() : label;
+      cacheSoul(name, content, hash);
+      console.log(pc.green(`\n✓ Pulled ${pc.bold(name)} (${label})`));
 
       // Ask if they want to swap immediately
       const shouldSwap = await inquirerConfirm({

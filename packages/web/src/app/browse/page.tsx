@@ -10,7 +10,7 @@ export default function BrowsePage() {
   const [souls, setSouls] = useState<Soul[]>([]);
   const [pagination, setPagination] = useState<PaginationType | null>(null);
   const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("recent");
+  const [sort, setSort] = useState("top");
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
 
@@ -46,12 +46,14 @@ export default function BrowsePage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Browse Souls</h1>
+      <h1 className="text-2xl font-bold mb-6">
+        Browse <code className="font-mono"><span className="text-accent">SOUL</span>.md</code> files
+      </h1>
 
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <input
           type="text"
-          placeholder="Search souls..."
+          placeholder="Search..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           className="flex-1 bg-bg-input border border-border rounded-md px-4 py-2 text-text placeholder:text-text-muted focus:outline-none focus:border-accent transition-colors"
@@ -77,7 +79,7 @@ export default function BrowsePage() {
           ))}
         </div>
       ) : souls.length === 0 ? (
-        <p className="text-text-muted text-center py-12">No souls found.</p>
+        <p className="text-text-muted text-center py-12">No results found.</p>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

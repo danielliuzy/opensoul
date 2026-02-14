@@ -23,8 +23,8 @@ export class S3Storage implements StorageInterface {
     });
   }
 
-  async saveSoul(slug: string, version: string, content: string): Promise<string> {
-    const key = `${slug}/${version}/soul.md`;
+  async saveSoul(slug: string, content: string): Promise<string> {
+    const key = `${slug}/soul.md`;
     await this.client.send(
       new PutObjectCommand({
         Bucket: this.bucket,
@@ -36,12 +36,12 @@ export class S3Storage implements StorageInterface {
     return key;
   }
 
-  async getSoul(slug: string, version: string): Promise<string | null> {
+  async getSoul(slug: string): Promise<string | null> {
     try {
       const res = await this.client.send(
         new GetObjectCommand({
           Bucket: this.bucket,
-          Key: `${slug}/${version}/soul.md`,
+          Key: `${slug}/soul.md`,
         })
       );
       return (await res.Body?.transformToString()) ?? null;
@@ -50,15 +50,12 @@ export class S3Storage implements StorageInterface {
     }
   }
 
-  async deleteSoul(slug: string, version?: string): Promise<void> {
-    if (version) {
-      await this.client.send(
-        new DeleteObjectCommand({
-          Bucket: this.bucket,
-          Key: `${slug}/${version}/soul.md`,
-        })
-      );
-    }
-    // For full slug deletion, would need ListObjects — skipped for simplicity
+  async deleteSoul(slug: string): Promise<void> {
+    await this.client.send(
+      new DeleteObjectCommand({
+        Bucket: this.bucket,
+        Key: `${slug}/soul.md`,
+      })
+    );
   }
 }

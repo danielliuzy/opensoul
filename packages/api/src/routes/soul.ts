@@ -1,17 +1,58 @@
 import { Hono } from "hono";
 import type { Client } from "@libsql/client";
-import { parseSoulFile } from "@soulmd/core";
-import { slugify } from "../storage/sqlite.js";
+import { createHash } from "node:crypto";
+import { nanoid } from "nanoid";
+import { generateObject } from "ai";
+import { openai } from "@ai-sdk/openai";
+import { z } from "zod";
 import type { StorageInterface } from "../storage/local.js";
-import type { SoulRecord, SoulVersionRecord } from "../storage/sqlite.js";
+import type { SoulWithAuthor } from "../storage/sqlite.js";
+import { generateLabel } from "../storage/sqlite.js";
 import { requireAuth } from "../middleware/auth.js";
 
-function extractName(soul: ReturnType<typeof parseSoulFile>): string {
-  if (soul.frontmatter.name) return soul.frontmatter.name;
-  const headingMatch = soul.raw.match(/^#\s+(.+)$/m);
+const SOUL_SELECT = "SELECT s.*, u.github_username as author FROM souls s JOIN users u ON s.user_id = u.id";
+
+function contentHash(content: string): string {
+  return createHash("sha256").update(content).digest("hex");
+}
+
+function fallbackName(content: string): string {
+  const headingMatch = content.match(/^#\s+(.+)$/m);
   if (headingMatch) return headingMatch[1].replace(/^SOUL\.md\s*[-–—]\s*/i, "").trim();
-  if (soul.sections[0]?.heading) return soul.sections[0].heading;
-  return `soul-${soul.hash.slice(0, 8)}`;
+  const firstLine = content.trim().split("\n")[0]?.trim();
+  if (firstLine && firstLine.length <= 60) return firstLine;
+  return `soul-${contentHash(content).slice(0, 8)}`;
+}
+
+async function summarize(content: string): Promise<{ name: string; description: string }> {
+  try {
+    const { object } = await generateObject({
+      model: openai("gpt-4o-mini"),
+      schema: z.object({
+        name: z
+          .string()
+          .describe(
+            "A short, memorable name for this persona (2-4 words, title case). Examples: 'Gentle Presence', 'Chaos Goblin', 'Senior TypeScript Engineer'",
+          ),
+        description: z
+          .string()
+          .describe(
+            "A single sentence summary of this persona, max 80 characters. Be punchy and specific, not generic.",
+          ),
+      }),
+      prompt: `You are analyzing a personality/persona definition for an AI assistant. Generate a short name and description that capture the essence of this persona.\n\n${content}`,
+    });
+    return object;
+  } catch {
+    return { name: fallbackName(content), description: "" };
+  }
+}
+
+function parseSoulRow(row: Record<string, unknown>) {
+  return {
+    ...row,
+    tags: JSON.parse(row.tags as string),
+  };
 }
 
 export function soulRoutes(db: Client, storage: StorageInterface) {
@@ -30,33 +71,31 @@ export function soulRoutes(db: Client, storage: StorageInterface) {
     const params: (string | number)[] = [];
 
     if (tag) {
-      whereClause = " WHERE tags LIKE ?";
+      whereClause = " WHERE s.tags LIKE ?";
       params.push(`%"${tag}"%`);
     } else if (search) {
-      whereClause = " WHERE name LIKE ? OR description LIKE ? OR author LIKE ?";
+      whereClause = " WHERE s.name LIKE ? OR s.description LIKE ? OR u.github_username LIKE ?";
       params.push(`%${search}%`, `%${search}%`, `%${search}%`);
     }
 
-    let orderClause = " ORDER BY updated_at DESC";
+    let orderClause = " ORDER BY s.updated_at DESC";
     if (sort === "top") {
-      orderClause = " ORDER BY rating_avg DESC, rating_count DESC";
+      orderClause = " ORDER BY s.rating_avg DESC, s.rating_count DESC";
     } else if (sort === "popular") {
-      orderClause = " ORDER BY rating_count DESC, rating_avg DESC";
+      orderClause = " ORDER BY s.rating_count DESC, s.rating_avg DESC";
     }
 
-    // Get total count
-    const countResult = await db.execute({ sql: `SELECT COUNT(*) as total FROM souls${whereClause}`, args: params });
+    const countResult = await db.execute({
+      sql: `SELECT COUNT(*) as total FROM souls s JOIN users u ON s.user_id = u.id${whereClause}`,
+      args: params,
+    });
     const total = Number(countResult.rows[0].total);
 
-    // Get paginated results
-    const query = `SELECT * FROM souls${whereClause}${orderClause} LIMIT ? OFFSET ?`;
+    const query = `${SOUL_SELECT}${whereClause}${orderClause} LIMIT ? OFFSET ?`;
     const result = await db.execute({ sql: query, args: [...params, limit, offset] });
 
     return c.json({
-      data: result.rows.map((s) => ({
-        ...s,
-        tags: JSON.parse(s.tags as string),
-      })),
+      data: result.rows.map(parseSoulRow),
       pagination: {
         page,
         limit,
@@ -66,57 +105,37 @@ export function soulRoutes(db: Client, storage: StorageInterface) {
     });
   });
 
-  // Get soul metadata (public)
+  // Get soul metadata (public) — accepts slug (nanoid) or label
   app.get("/:slug", async (c) => {
     const slug = c.req.param("slug");
-    const page = Math.max(1, parseInt(c.req.query("page") ?? "1", 10));
-    const limit = Math.min(50, Math.max(1, parseInt(c.req.query("limit") ?? "10", 10)));
-    const offset = (page - 1) * limit;
 
-    const result = await db.execute({ sql: "SELECT * FROM souls WHERE slug = ?", args: [slug] });
-    const soul = result.rows[0] as unknown as SoulRecord | undefined;
+    const result = await db.execute({
+      sql: `${SOUL_SELECT} WHERE s.slug = ? OR s.label = ?`,
+      args: [slug, slug],
+    });
+    const soul = result.rows[0] as unknown as SoulWithAuthor | undefined;
 
     if (!soul) {
       return c.json({ error: "Soul not found" }, 404);
     }
 
-    const countResult = await db.execute({
-      sql: "SELECT COUNT(*) as total FROM soul_versions WHERE soul_id = ?",
-      args: [soul.id],
-    });
-    const totalVersions = Number(countResult.rows[0].total);
-
-    const versionsResult = await db.execute({
-      sql: "SELECT version, content_hash, changelog, created_at FROM soul_versions WHERE soul_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?",
-      args: [soul.id, limit, offset],
-    });
-
-    return c.json({
-      ...soul,
-      tags: JSON.parse(soul.tags),
-      versions: {
-        data: versionsResult.rows,
-        pagination: {
-          page,
-          limit,
-          total: totalVersions,
-          totalPages: Math.ceil(totalVersions / limit),
-        },
-      },
-    });
+    return c.json(parseSoulRow(soul as unknown as Record<string, unknown>));
   });
 
-  // Get soul content (public)
+  // Get soul content (public) — accepts slug (nanoid) or label
   app.get("/:slug/content", async (c) => {
     const slug = c.req.param("slug");
-    const result = await db.execute({ sql: "SELECT * FROM souls WHERE slug = ?", args: [slug] });
-    const soul = result.rows[0] as unknown as SoulRecord | undefined;
+    const result = await db.execute({
+      sql: "SELECT * FROM souls WHERE slug = ? OR label = ?",
+      args: [slug, slug],
+    });
+    const soul = result.rows[0] as unknown as { slug: string } | undefined;
 
     if (!soul) {
       return c.json({ error: "Soul not found" }, 404);
     }
 
-    const content = await storage.getSoul(slug, soul.version);
+    const content = await storage.getSoul(soul.slug);
     if (!content) {
       return c.json({ error: "Soul content not found" }, 404);
     }
@@ -127,69 +146,150 @@ export function soulRoutes(db: Client, storage: StorageInterface) {
   // Upload new soul (requires auth)
   app.post("/", requireAuth, async (c) => {
     const user = c.get("user");
-    const body = await c.req.json<{ content: string; changelog?: string }>();
+    const body = await c.req.json<{ content: string }>();
     if (!body.content) {
       return c.json({ error: "Missing 'content' field" }, 400);
     }
 
-    const soul = parseSoulFile(body.content);
-    const name = extractName(soul);
-    const slug = slugify(name);
-    const version = soul.frontmatter.version ?? "0.0.0";
-    const author = user.github_username;
+    const { name, description } = await summarize(body.content);
+    const slug = nanoid(8);
+    const label = await generateLabel(db, name);
+    const hash = contentHash(body.content);
 
-    const existingResult = await db.execute({ sql: "SELECT * FROM souls WHERE slug = ?", args: [slug] });
-    if (existingResult.rows.length > 0) {
-      return c.json({ error: `Soul '${slug}' already exists. Use POST /:slug/versions to publish a new version.` }, 409);
-    }
-
-    const tags = JSON.stringify(soul.frontmatter.tags ?? []);
-    const filePath = await storage.saveSoul(slug, version, body.content);
-
-    const insertResult = await db.execute({
-      sql: "INSERT INTO souls (slug, name, author, description, version, tags) VALUES (?, ?, ?, ?, ?, ?)",
-      args: [slug, name, author, soul.frontmatter.description ?? null, version, tags],
-    });
+    await storage.saveSoul(slug, body.content);
 
     await db.execute({
-      sql: "INSERT INTO soul_versions (soul_id, version, content_hash, file_path, changelog) VALUES (?, ?, ?, ?, ?)",
-      args: [insertResult.lastInsertRowid!, version, soul.hash, filePath, body.changelog ?? null],
+      sql: "INSERT INTO souls (slug, label, name, user_id, description, tags) VALUES (?, ?, ?, ?, ?, ?)",
+      args: [slug, label, name, user.id, description, "[]"],
     });
 
-    return c.json({ slug, name, version, hash: soul.hash }, 201);
+    return c.json({ slug, label, name, hash }, 201);
   });
 
-  // Publish new version (requires auth)
-  app.post("/:slug/versions", requireAuth, async (c) => {
+  // Update soul name/description (requires auth + ownership)
+  app.patch("/:slug", requireAuth, async (c) => {
     const slug = c.req.param("slug");
-    const body = await c.req.json<{ content: string; changelog?: string }>();
+    const user = c.get("user");
+    const body = await c.req.json<{ name?: string; description?: string; label?: string }>();
 
-    if (!body.content) {
-      return c.json({ error: "Missing 'content' field" }, 400);
+    if (!body.name && !body.description && !body.label) {
+      return c.json({ error: "Nothing to update" }, 400);
     }
 
-    const existingResult = await db.execute({ sql: "SELECT * FROM souls WHERE slug = ?", args: [slug] });
-    const existing = existingResult.rows[0] as unknown as SoulRecord | undefined;
-    if (!existing) {
+    const result = await db.execute({
+      sql: `${SOUL_SELECT} WHERE s.slug = ? OR s.label = ?`,
+      args: [slug, slug],
+    });
+    const soul = result.rows[0] as unknown as SoulWithAuthor | undefined;
+
+    if (!soul) {
       return c.json({ error: "Soul not found" }, 404);
     }
 
-    const soul = parseSoulFile(body.content);
-    const version = soul.frontmatter.version ?? "0.0.0";
-    const name = extractName(soul);
-    const filePath = await storage.saveSoul(slug, version, body.content);
+    if ((soul.user_id as number) !== user.id) {
+      return c.json({ error: "Forbidden" }, 403);
+    }
+
+    const updates: string[] = [];
+    const args: (string | number)[] = [];
+
+    if (body.name) {
+      updates.push("name = ?");
+      args.push(body.name);
+      const newLabel = await generateLabel(db, body.name);
+      updates.push("label = ?");
+      args.push(newLabel);
+    }
+
+    if (body.label) {
+      const existing = await db.execute({
+        sql: "SELECT id FROM souls WHERE label = ? AND id != ?",
+        args: [body.label, soul.id],
+      });
+      if (existing.rows.length > 0) {
+        return c.json({ error: "Label already taken" }, 409);
+      }
+      updates.push("label = ?");
+      args.push(body.label);
+    }
+
+    if (body.description !== undefined) {
+      updates.push("description = ?");
+      args.push(body.description);
+    }
+
+    updates.push("updated_at = datetime('now')");
+    args.push(soul.id as number);
 
     await db.execute({
-      sql: "INSERT INTO soul_versions (soul_id, version, content_hash, file_path, changelog) VALUES (?, ?, ?, ?, ?)",
-      args: [existing.id, version, soul.hash, filePath, body.changelog ?? null],
+      sql: `UPDATE souls SET ${updates.join(", ")} WHERE id = ?`,
+      args,
     });
 
+    const updated = await db.execute({
+      sql: `${SOUL_SELECT} WHERE s.id = ?`,
+      args: [soul.id],
+    });
+
+    return c.json(parseSoulRow(updated.rows[0] as unknown as Record<string, unknown>));
+  });
+
+  // Update soul content (requires auth + ownership)
+  app.put("/:slug/content", requireAuth, async (c) => {
+    const slug = c.req.param("slug");
+    const user = c.get("user");
+    const body = await c.req.json<{ content: string }>();
+
+    if (!body.content) {
+      return c.json({ error: "Missing 'content' field" }, 400);
+    }
+
+    const result = await db.execute({
+      sql: `${SOUL_SELECT} WHERE s.slug = ? OR s.label = ?`,
+      args: [slug, slug],
+    });
+    const soul = result.rows[0] as unknown as SoulWithAuthor | undefined;
+
+    if (!soul) {
+      return c.json({ error: "Soul not found" }, 404);
+    }
+
+    if ((soul.user_id as number) !== user.id) {
+      return c.json({ error: "Forbidden" }, 403);
+    }
+
+    await storage.saveSoul(soul.slug as string, body.content);
     await db.execute({
-      sql: "UPDATE souls SET version = ?, updated_at = datetime('now') WHERE id = ?",
-      args: [version, existing.id],
+      sql: "UPDATE souls SET updated_at = datetime('now') WHERE id = ?",
+      args: [soul.id],
     });
 
-    return c.json({ slug, name, version, hash: soul.hash });
+    return c.json({ ok: true });
+  });
+
+  // Delete soul (requires auth + ownership)
+  app.delete("/:slug", requireAuth, async (c) => {
+    const slug = c.req.param("slug");
+    const user = c.get("user");
+
+    const result = await db.execute({
+      sql: `${SOUL_SELECT} WHERE s.slug = ? OR s.label = ?`,
+      args: [slug, slug],
+    });
+    const soul = result.rows[0] as unknown as SoulWithAuthor | undefined;
+
+    if (!soul) {
+      return c.json({ error: "Soul not found" }, 404);
+    }
+
+    if ((soul.user_id as number) !== user.id) {
+      return c.json({ error: "Forbidden" }, 403);
+    }
+
+    await storage.deleteSoul(soul.slug as string);
+    await db.execute({ sql: "DELETE FROM souls WHERE id = ?", args: [soul.id] });
+
+    return c.json({ ok: true });
   });
 
   // Rate a soul (requires auth)
@@ -202,19 +302,20 @@ export function soulRoutes(db: Client, storage: StorageInterface) {
       return c.json({ error: "Rating must be an integer between 1 and 5" }, 400);
     }
 
-    const soulResult = await db.execute({ sql: "SELECT * FROM souls WHERE slug = ?", args: [slug] });
-    const soul = soulResult.rows[0] as unknown as SoulRecord | undefined;
+    const soulResult = await db.execute({
+      sql: "SELECT * FROM souls WHERE slug = ? OR label = ?",
+      args: [slug, slug],
+    });
+    const soul = soulResult.rows[0] as unknown as { id: number } | undefined;
     if (!soul) {
       return c.json({ error: "Soul not found" }, 404);
     }
 
-    // Upsert rating
     await db.execute({
       sql: "INSERT INTO soul_ratings (soul_id, user_id, rating) VALUES (?, ?, ?) ON CONFLICT(soul_id, user_id) DO UPDATE SET rating = excluded.rating",
       args: [soul.id, user.id, body.rating],
     });
 
-    // Recalculate cached avg/count
     const statsResult = await db.execute({
       sql: "SELECT AVG(rating) as avg, COUNT(*) as count FROM soul_ratings WHERE soul_id = ?",
       args: [soul.id],

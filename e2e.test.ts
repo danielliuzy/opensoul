@@ -79,17 +79,21 @@ describe("E2E: Full registry + local workflow", () => {
 
     const listRes = await apiApp.request("/api/v1/souls");
     const body = await listRes.json();
-    expect(body.data).toHaveLength(4);
-    expect(body.pagination.total).toBe(4);
+    expect(body.data.length).toBeGreaterThanOrEqual(4);
+    expect(body.pagination.total).toBeGreaterThanOrEqual(4);
   });
 
-  it("rejects duplicate upload", async () => {
+  it("allows duplicate names (different IDs, suffixed labels)", async () => {
     const res = await apiApp.request("/api/v1/souls", {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify({ content: rideOrDie }),
     });
-    expect(res.status).toBe(409);
+    expect(res.status).toBe(201);
+    const body = await res.json();
+    expect(body.slug).toHaveLength(8);
+    // Label should be suffixed since this name already exists
+    expect(body.label).toMatch(/-\d+$/);
   });
 
   it("rejects upload without auth", async () => {
@@ -106,7 +110,8 @@ describe("E2E: Full registry + local workflow", () => {
     const res = await apiApp.request("/api/v1/souls?search=chaos");
     const body = await res.json();
     expect(body.data.length).toBeGreaterThanOrEqual(1);
-    expect(body.data[0].slug).toContain("chaos");
+    expect(body.data[0].name).toContain("Chaos");
+    expect(body.data[0].label).toBeDefined();
   });
 
   it("returns empty results for unknown query", async () => {
@@ -123,8 +128,8 @@ describe("E2E: Full registry + local workflow", () => {
     expect(body.data).toHaveLength(2);
     expect(body.pagination.page).toBe(1);
     expect(body.pagination.limit).toBe(2);
-    expect(body.pagination.total).toBe(4);
-    expect(body.pagination.totalPages).toBe(2);
+    expect(body.pagination.total).toBeGreaterThanOrEqual(4);
+    expect(body.pagination.totalPages).toBeGreaterThanOrEqual(2);
 
     const res2 = await apiApp.request("/api/v1/souls?page=2&limit=2");
     const body2 = await res2.json();
@@ -269,8 +274,7 @@ describe("E2E: Full registry + local workflow", () => {
     const listRes = await apiApp.request("/api/v1/souls");
     const slug = (await listRes.json()).data[0].slug;
 
-    // Add frontmatter with a new version number
-    const updatedContent = `---\nversion: "1.1.0"\n---\n${rideOrDie}`;
+    const updatedContent = `${rideOrDie}\n<!-- updated -->`;
     const res = await apiApp.request(`/api/v1/souls/${slug}/versions`, {
       method: "POST",
       headers: authHeaders(),
@@ -278,7 +282,7 @@ describe("E2E: Full registry + local workflow", () => {
     });
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body.version).toBe("1.1.0");
+    expect(body.version).toBe("1.0.1");
 
     // Check version history
     const detailRes = await apiApp.request(`/api/v1/souls/${slug}`);

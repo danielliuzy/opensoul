@@ -1,22 +1,16 @@
 export interface Soul {
   id: number;
   slug: string;
+  label: string;
   name: string;
+  user_id: number;
   author: string;
   description: string | null;
-  version: string;
   tags: string[];
   rating_avg: number;
   rating_count: number;
   created_at: string;
   updated_at: string;
-}
-
-export interface SoulVersion {
-  version: string;
-  content_hash: string;
-  changelog: string | null;
-  created_at: string;
 }
 
 export interface Pagination {
@@ -31,12 +25,7 @@ export interface SoulListResponse {
   pagination: Pagination;
 }
 
-export interface SoulDetailResponse extends Soul {
-  versions: {
-    data: SoulVersion[];
-    pagination: Pagination;
-  };
-}
+export interface SoulDetailResponse extends Soul {}
 
 export interface RateResponse {
   slug: string;
@@ -48,7 +37,6 @@ export interface RateResponse {
 export interface UploadResponse {
   slug: string;
   name: string;
-  version: string;
   hash: string;
 }
 

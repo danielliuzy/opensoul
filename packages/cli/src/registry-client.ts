@@ -2,10 +2,10 @@ import { loadConfig } from "./config.js";
 
 export interface RegistrySoul {
   slug: string;
+  label: string;
   name: string;
   author: string;
   description: string | null;
-  version: string;
   tags: string[];
   rating_avg?: number;
   rating_count?: number;
@@ -41,8 +41,8 @@ export class RegistryClient {
     return res.json() as Promise<{ data: RegistrySoul[]; pagination: { page: number; limit: number; total: number; totalPages: number } }>;
   }
 
-  async getContent(slug: string): Promise<string> {
-    const url = `${this.baseUrl}/api/v1/souls/${slug}/content`;
+  async getContent(id: string): Promise<string> {
+    const url = `${this.baseUrl}/api/v1/souls/${id}/content`;
 
     const res = await fetch(url).catch(() => {
       throw new Error(`Failed to connect to registry at ${this.baseUrl}. Is it reachable?`);
@@ -50,7 +50,7 @@ export class RegistryClient {
 
     if (!res.ok) {
       if (res.status === 404) {
-        throw new Error(`Soul '${slug}' not found in registry`);
+        throw new Error(`Soul '${id}' not found in registry`);
       }
       throw new Error(`Registry returned HTTP ${res.status}`);
     }

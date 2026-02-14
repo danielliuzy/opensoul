@@ -1,6 +1,5 @@
 export interface SoulFrontmatter {
   name: string;
-  version: string;
   author: string;
   description?: string;
   tags?: string[];
@@ -30,12 +29,10 @@ export interface SwapResponse {
   success: boolean;
   soul: {
     name: string;
-    version: string;
     hash: string;
   };
   previous?: {
     name: string;
-    version: string;
     hash: string;
   };
   swappedAt: string;
@@ -45,7 +42,6 @@ export interface BotStatus {
   running: boolean;
   currentSoul: {
     name: string;
-    version: string;
     hash: string;
     loadedAt: string;
   } | null;
@@ -56,7 +52,6 @@ export interface BotStatus {
 export interface HistoryEntry {
   soul: {
     name: string;
-    version: string;
     hash: string;
   };
   action: "swap" | "rollback";

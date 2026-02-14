@@ -1,6 +1,21 @@
 @import "tailwindcss";
 
 @theme {
+  --color-bg: #ffffff;
+  --color-bg-card: #f5f5f7;
+  --color-bg-hover: #ebebef;
+  --color-bg-input: #f0f0f4;
+  --color-border: #d4d4dc;
+  --color-text: #1a1a2e;
+  --color-text-muted: #6b6b80;
+  --color-accent: #7c5cfc;
+  --color-accent-hover: #6a48e8;
+  --color-star: #f5c542;
+  --color-success: #16a34a;
+  --color-error: #dc2626;
+}
+
+.dark {
   --color-bg: #0a0a0f;
   --color-bg-card: #12121a;
   --color-bg-hover: #1a1a25;
@@ -19,6 +34,11 @@ body {
   background-color: var(--color-bg);
   color: var(--color-text);
   font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+button,
+[role="button"] {
+  cursor: pointer;
 }
 
 ::selection {

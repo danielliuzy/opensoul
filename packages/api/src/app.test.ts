@@ -86,20 +86,28 @@ describe("Soul CRUD API", () => {
     expect(body.data[0].author).toBe("testuser");
   });
 
-  it("rejects duplicate upload", async () => {
-    await app.request("/api/v1/souls", {
+  it("allows duplicate names with different IDs and suffixed labels", async () => {
+    const res1 = await app.request("/api/v1/souls", {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify({ content: rideOrDie }),
     });
+    expect(res1.status).toBe(201);
+    const data1 = await res1.json();
 
-    const res = await app.request("/api/v1/souls", {
+    const res2 = await app.request("/api/v1/souls", {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify({ content: rideOrDie }),
     });
+    expect(res2.status).toBe(201);
+    const data2 = await res2.json();
 
-    expect(res.status).toBe(409);
+    expect(data1.slug).not.toBe(data2.slug);
+    expect(data1.slug).toHaveLength(8);
+    expect(data2.slug).toHaveLength(8);
+    // Labels should be unique with suffix
+    expect(data2.label).toBe(`${data1.label}-2`);
   });
 
   it("lists souls (public)", async () => {

@@ -1,4 +1,4 @@
-# SOUL.md - Professional Warmth
+Professional Warmth
 
 _Competence and kindness aren't competing priorities._
 
