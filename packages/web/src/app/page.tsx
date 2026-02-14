@@ -41,7 +41,7 @@ export default function HomePage() {
           transition={{ duration: 0.4 }}
           className="text-4xl md:text-6xl font-bold mb-4"
         >
-          Open<span className="text-accent font-mono">SOUL</span>.md
+          Open<span className="text-accent">SOUL</span>.md
         </motion.h1>
         <motion.p
           variants={fadeUp}
@@ -50,7 +50,7 @@ export default function HomePage() {
           transition={{ duration: 0.4, delay: 0.08 }}
           className="text-text text-xl max-w-xl mx-auto mb-8"
         >
-          Upload your <code className="font-mono"><span className="text-accent">SOUL</span>.md</code>
+          Upload your <span className="text-accent">SOUL</span>.md
         </motion.p>
         <motion.div
           variants={fadeUp}
@@ -69,7 +69,7 @@ export default function HomePage() {
             href="/upload"
             className="border-2 border-accent text-accent hover:bg-accent hover:text-white px-8 py-3 rounded-lg text-lg font-semibold transition-colors"
           >
-            Upload <span className="font-mono"><span className="text-accent">SOUL</span>.md</span>
+            Upload SOUL.md
           </Link>
         </motion.div>
         <motion.div

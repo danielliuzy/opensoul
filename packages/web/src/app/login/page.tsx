@@ -15,7 +15,7 @@ export default function LoginPage() {
 
   return (
     <div className="text-center py-16">
-      <h1 className="text-2xl font-bold mb-4">Login to <code className="font-mono"><span className="text-accent">SOUL</span>.md</code></h1>
+      <h1 className="text-2xl font-bold mb-4">Login to Open<span className="text-accent">SOUL</span>.md</h1>
       <p className="text-text-muted mb-8">
         Sign in with your GitHub account to upload and rate souls.
       </p>

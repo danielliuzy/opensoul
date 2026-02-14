@@ -47,7 +47,7 @@ export default function BrowsePage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">
-        Browse <code className="font-mono"><span className="text-accent">SOUL</span>.md</code> files
+        Browse <span className="text-accent">SOUL</span>.md files
       </h1>
 
       <div className="flex flex-col sm:flex-row gap-3 mb-6">

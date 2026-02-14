@@ -2,7 +2,19 @@ import type { Metadata } from "next";
 import { AuthProvider } from "@/lib/auth";
 import { ThemeProvider } from "@/lib/theme";
 import Navbar from "@/components/Navbar";
+import { Source_Serif_4, Inter } from "next/font/google";
 import "./globals.css";
+
+const sourceSerif = Source_Serif_4({
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "OpenSOUL.md",
@@ -15,8 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
-      <body>
+    <html lang="en" className={`dark ${inter.variable}`} suppressHydrationWarning>
+      <body className={sourceSerif.className}>
         <ThemeProvider>
           <AuthProvider>
             <Navbar />

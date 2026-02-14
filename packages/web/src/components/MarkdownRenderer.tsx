@@ -15,7 +15,7 @@ export default function MarkdownRenderer({ content, onCopy, copied }: MarkdownRe
         components={{
           h1: ({ children }) => (
             <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
-              <h1 className="text-2xl font-bold text-text">
+              <h1 className="text-2xl font-bold text-accent">
                 {children}
               </h1>
               {onCopy && (
@@ -29,25 +29,25 @@ export default function MarkdownRenderer({ content, onCopy, copied }: MarkdownRe
             </div>
           ),
           h2: ({ children }) => (
-            <h2 className="text-xl font-semibold text-text mt-8 mb-3">
+            <h2 className="text-xl font-semibold text-accent mt-8 mb-3">
               {children}
             </h2>
           ),
           h3: ({ children }) => (
-            <h3 className="text-lg font-semibold text-text mt-6 mb-2">
+            <h3 className="text-lg font-semibold text-accent mt-6 mb-2">
               {children}
             </h3>
           ),
           p: ({ children }) => (
-            <p className="text-text-muted leading-relaxed mb-4">{children}</p>
+            <p className="text-text leading-relaxed mb-4">{children}</p>
           ),
           ul: ({ children }) => (
-            <ul className="list-disc list-inside text-text-muted mb-4 space-y-1">
+            <ul className="list-disc list-inside text-text mb-4 space-y-1">
               {children}
             </ul>
           ),
           ol: ({ children }) => (
-            <ol className="list-decimal list-inside text-text-muted mb-4 space-y-1">
+            <ol className="list-decimal list-inside text-text mb-4 space-y-1">
               {children}
             </ol>
           ),

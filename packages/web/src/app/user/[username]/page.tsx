@@ -85,7 +85,7 @@ export default function UserProfilePage() {
         </div>
       ) : souls.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-text-muted">This user hasn&apos;t uploaded any <code className="font-mono"><span className="text-accent">SOUL</span>.md</code> files yet.</p>
+          <p className="text-text-muted">This user hasn&apos;t uploaded any <span className="text-accent">SOUL</span>.md files yet.</p>
         </div>
       ) : (
         <>

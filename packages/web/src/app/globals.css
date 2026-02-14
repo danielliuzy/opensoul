@@ -1,30 +1,33 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #ffffff;
-  --color-bg-card: #f5f5f7;
-  --color-bg-hover: #ebebef;
-  --color-bg-input: #f0f0f4;
-  --color-border: #d4d4dc;
-  --color-text: #1a1a2e;
-  --color-text-muted: #6b6b80;
-  --color-accent: #7c5cfc;
-  --color-accent-hover: #6a48e8;
+  --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Source Serif 4", Georgia, serif;
+
+  --color-bg: #fafafa;
+  --color-bg-card: #f0f0f0;
+  --color-bg-hover: #e6e6e6;
+  --color-bg-input: #f0f0f0;
+  --color-border: #e0e0e0;
+  --color-text: #1a1a1a;
+  --color-text-muted: #666666;
+  --color-accent: #d4a83a;
+  --color-accent-hover: #b8952e;
   --color-star: #f5c542;
   --color-success: #16a34a;
   --color-error: #dc2626;
 }
 
 .dark {
-  --color-bg: #0a0a0f;
-  --color-bg-card: #12121a;
-  --color-bg-hover: #1a1a25;
-  --color-bg-input: #16161f;
-  --color-border: #2a2a3a;
-  --color-text: #e4e4ed;
-  --color-text-muted: #8888a0;
-  --color-accent: #7c5cfc;
-  --color-accent-hover: #6a48e8;
+  --color-bg: #111111;
+  --color-bg-card: #1a1a1a;
+  --color-bg-hover: #222222;
+  --color-bg-input: #1a1a1a;
+  --color-border: #333333;
+  --color-text: #e8e8e8;
+  --color-text-muted: #999999;
+  --color-accent: #dbb978;
+  --color-accent-hover: #c9a96e;
   --color-star: #f5c542;
   --color-success: #34d399;
   --color-error: #f87171;
@@ -33,7 +36,8 @@
 body {
   background-color: var(--color-bg);
   color: var(--color-text);
-  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-family: var(--font-serif);
+  line-height: 1.7;
 }
 
 button,

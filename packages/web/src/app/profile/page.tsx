@@ -70,10 +70,7 @@ export default function ProfilePage() {
             {pagination ? (
               <>
                 {pagination.total}{" "}
-                <span className="font-mono">
-                  <span className="text-accent">SOUL</span>
-                  {pagination.total !== 1 ? "s" : ""}
-                </span>{" "}
+                <span className="text-accent">SOUL</span>{pagination.total !== 1 ? "s" : ""}{" "}
                 uploaded
               </>
             ) : (
@@ -93,9 +90,7 @@ export default function ProfilePage() {
         <div className="text-center py-12">
           <p className="text-text-muted mb-4">
             You haven&apos;t uploaded any{" "}
-            <code className="font-mono">
-              <span className="text-accent">SOUL</span>.md
-            </code>{" "}
+            <span className="text-accent">SOUL</span>.md{" "}
             files yet.
           </p>
           <a
@@ -103,9 +98,7 @@ export default function ProfilePage() {
             className="bg-accent hover:bg-accent-hover text-white px-6 py-2.5 rounded-md font-medium transition-colors"
           >
             Upload your first{" "}
-            <span className="font-mono">
-              <span className="text-accent">SOUL</span>.md
-            </span>
+            SOUL.md
           </a>
         </div>
       ) : (

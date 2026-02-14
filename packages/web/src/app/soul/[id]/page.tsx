@@ -7,6 +7,7 @@ import { getSoul, getSoulContent, rateSoul, updateSoul, updateSoulContent, delet
 import { useAuth } from "@/lib/auth";
 import type { SoulDetailResponse } from "@/lib/types";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
+import MarkdownEditor from "@/components/MarkdownEditor";
 import StarRating from "@/components/StarRating";
 import { Pencil, Copy, Check, Download, Trash2, SquarePen } from "lucide-react";
 
@@ -141,7 +142,7 @@ export default function SoulDetailPage() {
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <h1 className="text-2xl font-bold text-text truncate">{soul.name}</h1>
+                    <h1 className="text-2xl font-bold text-accent truncate">{soul.name}</h1>
                     {isOwner && (
                       <button
                         type="button"
@@ -155,7 +156,7 @@ export default function SoulDetailPage() {
                   </div>
                 )}
                 {!editingContent && (
-                  <div className="flex gap-2 shrink-0">
+                  <div className="flex gap-2 shrink-0 font-sans">
                     <button
                       type="button"
                       onClick={() => {
@@ -209,14 +210,13 @@ export default function SoulDetailPage() {
               </div>
               <hr className="border-border mb-4" />
               {editingContent ? (
-                <div>
-                  <textarea
+                <div className="flex flex-col" style={{ minHeight: "calc(100vh - 16rem)" }}>
+                  <MarkdownEditor
                     value={contentDraft}
-                    onChange={(e) => setContentDraft(e.target.value)}
-                    className="w-full min-h-[60vh] text-sm font-mono text-text bg-bg-input border border-border rounded-lg p-4 resize-y focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent"
-                    spellCheck={false}
+                    onChange={setContentDraft}
+                    className="flex-1"
                   />
-                  <div className="flex gap-2 mt-3">
+                  <div className="flex gap-2 mt-3 font-sans">
                     <button
                       type="button"
                       onClick={async () => {
@@ -305,7 +305,7 @@ export default function SoulDetailPage() {
             {/* Description */}
             {editing === "desc" ? (
               <div className="space-y-2">
-                <span className="text-xs text-text-muted uppercase tracking-wide">
+                <span className="text-xs text-text-muted uppercase tracking-wide font-sans">
                   Description
                 </span>
                 <textarea
@@ -337,7 +337,7 @@ export default function SoulDetailPage() {
               (soul.description || isOwner) && (
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-text-muted uppercase tracking-wide">
+                    <span className="text-xs text-text-muted uppercase tracking-wide font-sans">
                       Description
                     </span>
                     {isOwner && (
@@ -359,7 +359,7 @@ export default function SoulDetailPage() {
             )}
 
             <div>
-              <span className="text-xs text-text-muted uppercase tracking-wide">
+              <span className="text-xs text-text-muted uppercase tracking-wide font-sans">
                 Rating
               </span>
               <div className="flex items-center gap-2 mt-1">
@@ -380,7 +380,7 @@ export default function SoulDetailPage() {
               )}
             </div>
             <div>
-              <span className="text-xs text-text-muted uppercase tracking-wide">
+              <span className="text-xs text-text-muted uppercase tracking-wide font-sans">
                 Author
               </span>
               <Link href={`/user/${soul.author}`} className="block text-accent font-medium underline hover:text-accent/80 transition-colors">
@@ -389,7 +389,7 @@ export default function SoulDetailPage() {
             </div>
             {soul.tags.length > 0 && (
               <div>
-                <span className="text-xs text-text-muted uppercase tracking-wide">
+                <span className="text-xs text-text-muted uppercase tracking-wide font-sans">
                   Tags
                 </span>
                 <div className="flex flex-wrap gap-1.5 mt-1">
@@ -405,7 +405,7 @@ export default function SoulDetailPage() {
               </div>
             )}
             <div>
-              <span className="text-xs text-text-muted uppercase tracking-wide">
+              <span className="text-xs text-text-muted uppercase tracking-wide font-sans">
                 Install via CLI
               </span>
               <div className="relative mt-1">

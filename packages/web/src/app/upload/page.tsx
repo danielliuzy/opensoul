@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { uploadSoul } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
+import MarkdownEditor from "@/components/MarkdownEditor";
 
 export default function UploadPage() {
   const { user, isLoading } = useAuth();
@@ -58,10 +59,7 @@ export default function UploadPage() {
         <h1 className="text-2xl font-bold mb-4">Login Required</h1>
         <p className="text-text-muted mb-6">
           You need to be logged in to upload a{" "}
-          <code className="font-mono">
-            <span className="text-accent">SOUL</span>.md
-          </code>
-          .
+          <span className="text-accent">SOUL</span>.md.
         </p>
         <a
           href="/login"
@@ -95,12 +93,10 @@ export default function UploadPage() {
     <div>
       <h1 className="text-2xl font-bold mb-6">
         Upload your{" "}
-        <code className="font-mono">
-          <span className="text-accent">SOUL</span>.md
-        </code>
+        <span className="text-accent">SOUL</span>.md
       </h1>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="flex flex-col" style={{ minHeight: "calc(100vh - 16rem)" }}>
         {/* Drop zone */}
         <div
           onDrop={handleDrop}
@@ -129,11 +125,8 @@ export default function UploadPage() {
             <label className="cursor-pointer">
               <p className="text-text-muted mb-1">
                 Drag & drop a{" "}
-                <code className="font-medium">
-                  <span className="text-accent">SOUL</span>.md
-                </code>{" "}
-                file here (or any{" "}
-                <code className="text-text font-medium">.md</code> file)
+                <span className="font-medium"><span className="text-accent">SOUL</span>.md</span>{" "}
+                file here (or any <span className="font-medium">.md</span> file)
               </p>
               <p className="text-text-muted text-sm">
                 or <span className="text-accent underline">browse files</span>
@@ -161,17 +154,12 @@ export default function UploadPage() {
         </div>
 
         {/* Paste textarea */}
-        <textarea
-          value={hasFile ? content : content}
-          onChange={(e) => setContent(e.target.value)}
+        <MarkdownEditor
+          value={content}
+          onChange={setContent}
           placeholder="Paste your SOUL.md content here..."
-          rows={12}
-          disabled={hasFile}
-          className={`w-full bg-bg-input border border-border rounded-lg px-4 py-3 placeholder:text-text-muted focus:outline-none focus:border-accent transition-colors font-mono text-sm resize-y mb-4 ${
-            hasFile
-              ? "opacity-40 cursor-not-allowed text-text-muted"
-              : "text-text"
-          }`}
+          readOnly={hasFile}
+          className={`flex-1 mb-4 ${hasFile ? "opacity-40" : ""}`}
         />
 
         {error && <p className="text-error text-sm mb-4">{error}</p>}
@@ -179,15 +167,15 @@ export default function UploadPage() {
         <button
           type="submit"
           disabled={submitting || !content.trim()}
-          className="bg-accent hover:bg-accent-hover text-white px-6 py-2.5 rounded-md font-medium transition-colors disabled:opacity-50"
+          className="bg-accent hover:bg-accent-hover text-white px-6 py-2.5 rounded-md font-medium transition-colors disabled:opacity-50 font-sans"
         >
           {submitting ? (
             <>
-              Uploading <code className="font-mono">SOUL.md</code>...
+              Uploading SOUL.md...
             </>
           ) : (
             <>
-              Upload <code className="font-mono">SOUL.md</code>
+              Upload SOUL.md
             </>
           )}
         </button>
