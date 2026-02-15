@@ -141,17 +141,18 @@ program
             const client = new RegistryClient();
             log(`Registry URL: ${loadConfig().registry_url}`);
             log(`Trying label: ${label}`);
-            content = await client.getContent(label);
+            const [meta, fetchedContent] = await Promise.all([
+              client.getMeta(label),
+              client.getContent(label),
+            ]);
+            content = fetchedContent;
             const hash = createHash("sha256").update(content).digest("hex");
-            const headingMatch = content.match(/^#\s+(.+)$/m);
-            const name = headingMatch
-              ? headingMatch[1].replace(/^SOUL\.md\s*[-–—]\s*/i, "").trim()
-              : label;
-            cacheSoul(name, content, hash, label);
+            const name = meta.name;
+            cacheSoul(name, content, hash, meta.label);
             soulName = name;
-            source = `registry:${label}`;
+            source = `registry:${meta.label}`;
             s.stop(
-              pc.green(`🔮 Summoned ${pc.yellow(pc.bold(name))} (${label})`),
+              pc.green(`🔮 Summoned ${pc.yellow(pc.bold(name))} (${meta.label})`),
             );
           } catch (err) {
             s.stop();
@@ -294,8 +295,9 @@ program
             const desc = soul.description
               ? pc.dim(` — ${soul.description}`)
               : "";
+            const nameTag = soul.name !== soul.label ? ` ${pc.yellow(`(${soul.name})`)}` : "";
             console.log(
-              `  ${pc.cyan(pc.bold(soul.label))} ${pc.magenta(`by ${soul.author}`)}${rating}${desc}`,
+              `  ${pc.cyan(pc.bold(soul.label))}${nameTag} ${pc.magenta(`by ${soul.author}`)}${rating}${desc}`,
             );
           }
           return;
@@ -312,8 +314,9 @@ program
             : "";
           const author = pc.magenta(`by ${soul.author}`);
           const desc = soul.description ? pc.dim(` — ${soul.description}`) : "";
+          const nameTag = soul.name !== soul.label ? ` ${pc.yellow(`(${soul.name})`)}` : "";
           return {
-            name: `${pc.cyan(pc.bold(soul.label))} ${author}${rating}${desc}`,
+            name: `${pc.cyan(pc.bold(soul.label))}${nameTag} ${author}${rating}${desc}`,
             value: soul.label,
           };
         });
@@ -334,13 +337,13 @@ program
 
         // Summon the selected soul
         log(`Summoning soul '${label}' from registry`);
-        const content = await client.getContent(label);
+        const [meta, content] = await Promise.all([
+          client.getMeta(label),
+          client.getContent(label),
+        ]);
         const hash = createHash("sha256").update(content).digest("hex");
-        const headingMatch = content.match(/^#\s+(.+)$/m);
-        const name = headingMatch
-          ? headingMatch[1].replace(/^SOUL\.md\s*[-–—]\s*/i, "").trim()
-          : label;
-        cacheSoul(name, content, hash, label);
+        const name = meta.name;
+        cacheSoul(name, content, hash, meta.label);
         console.log(
           pc.green(`🔮 Summoned ${pc.yellow(pc.bold(name))} (${label})`),
         );
@@ -388,14 +391,14 @@ program
     try {
       const client = new RegistryClient();
       log(`Registry URL: ${loadConfig().registry_url}`);
-      const content = await client.getContent(label);
+      const [meta, content] = await Promise.all([
+        client.getMeta(label),
+        client.getContent(label),
+      ]);
       const hash = createHash("sha256").update(content).digest("hex");
-      const headingMatch = content.match(/^#\s+(.+)$/m);
-      const name = headingMatch
-        ? headingMatch[1].replace(/^SOUL\.md\s*[-–—]\s*/i, "").trim()
-        : label;
+      const name = meta.name;
 
-      cacheSoul(name, content, hash, label);
+      cacheSoul(name, content, hash, meta.label);
 
       console.log(
         pc.green(`\n🔮 Summoned ${pc.yellow(pc.bold(name))} (${label})`),

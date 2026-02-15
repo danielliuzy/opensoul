@@ -41,6 +41,23 @@ export class RegistryClient {
     return res.json() as Promise<{ data: RegistrySoul[]; pagination: { page: number; limit: number; total: number; totalPages: number } }>;
   }
 
+  async getMeta(id: string): Promise<RegistrySoul> {
+    const url = `${this.baseUrl}/api/v1/souls/${id}`;
+
+    const res = await fetch(url).catch(() => {
+      throw new Error(`Failed to connect to registry at ${this.baseUrl}. Is it reachable?`);
+    });
+
+    if (!res.ok) {
+      if (res.status === 404) {
+        throw new Error(`Soul '${id}' not found in registry`);
+      }
+      throw new Error(`Registry returned HTTP ${res.status}`);
+    }
+
+    return res.json() as Promise<RegistrySoul>;
+  }
+
   async getContent(id: string): Promise<string> {
     const url = `${this.baseUrl}/api/v1/souls/${id}/content`;
 
