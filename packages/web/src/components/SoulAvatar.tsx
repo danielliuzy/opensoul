@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { getSoulImageUrl } from "@/lib/api";
 
 interface SoulAvatarProps {
@@ -28,12 +29,11 @@ export default function SoulAvatar({ soul, size = 64, className = "", version }:
   }
 
   return (
-    <img
+    <Image
       src={`${getSoulImageUrl(soul.slug)}?v=${encodeURIComponent(soul.image_url)}${version ? `&t=${version}` : ""}`}
       alt={soul.name}
       width={size}
       height={size}
-      loading="lazy"
       onError={() => setError(true)}
       className={`shrink-0 rounded-full object-cover ${className}`}
       style={{ width: size, height: size }}

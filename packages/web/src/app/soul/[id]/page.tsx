@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { getSoul, getSoulContent, getSoulImageUrl, rateSoul, updateSoul, updateSoulContent, deleteSoul } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import type { SoulDetailResponse } from "@/lib/types";
@@ -481,9 +482,11 @@ export default function SoulDetailPage() {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 cursor-pointer"
           onClick={() => setShowLightbox(false)}
         >
-          <img
+          <Image
             src={`${getSoulImageUrl(soul.slug)}?v=${encodeURIComponent(soul.image_url)}&t=${imageVersion}`}
             alt={soul.name}
+            width={400}
+            height={400}
             className="max-w-[min(400px,80vw)] max-h-[min(400px,80vh)] rounded-xl shadow-2xl object-contain"
             onClick={(e) => e.stopPropagation()}
           />

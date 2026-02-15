@@ -7,6 +7,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "avatars.githubusercontent.com",
       },
+      {
+        protocol: "https",
+        hostname: "opensoul-api.zyliu-daniel.workers.dev",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+      },
     ],
   },
 };
