@@ -21,34 +21,30 @@ afterEach(() => {
 describe("loadConfig", () => {
   it("creates default config when none exists", () => {
     const config = loadConfig();
-    expect(config.cache_dir).toContain(".soul/cache");
-    expect(config.swap_mode).toBe("immediate");
+    expect(config.registry_url).toBeDefined();
     // Should have created the file
     expect(existsSync(join(tmpDir, ".soulrc.yaml"))).toBe(true);
   });
 
   it("loads existing config", () => {
     const config = loadConfig();
-    config.swap_mode = "confirm";
+    config.registry_url = "https://custom.example.com";
     saveConfig(config);
 
     const reloaded = loadConfig();
-    expect(reloaded.swap_mode).toBe("confirm");
+    expect(reloaded.registry_url).toBe("https://custom.example.com");
   });
 
   it("merges defaults with partial config", () => {
     const config = loadConfig();
-    expect(config.default_bot).toBeDefined();
-    expect(config.auth_token).toBeDefined();
-    expect(config.cache_dir).toBeDefined();
-    expect(config.swap_mode).toBeDefined();
+    expect(config.registry_url).toBeDefined();
   });
 });
 
 describe("getConfigValue", () => {
   it("returns a config value by key", () => {
-    const value = getConfigValue("swap_mode");
-    expect(value).toBe("immediate");
+    const value = getConfigValue("registry_url");
+    expect(value).toContain("opensoul-api");
   });
 
   it("returns undefined for unknown key", () => {
@@ -59,8 +55,8 @@ describe("getConfigValue", () => {
 
 describe("setConfigValue", () => {
   it("sets and persists a config value", () => {
-    setConfigValue("swap_mode", "confirm");
-    expect(getConfigValue("swap_mode")).toBe("confirm");
+    setConfigValue("registry_url", "https://custom.example.com");
+    expect(getConfigValue("registry_url")).toBe("https://custom.example.com");
   });
 
   it("adds new keys", () => {

@@ -32,8 +32,8 @@ describe("skill install/uninstall", () => {
     const content = readFileSync(path, "utf-8");
     expect(content).toContain("name: opensoul");
     expect(content).toContain("soul search");
-    expect(content).toContain("soul swap");
-    expect(content).toContain("soul rollback");
+    expect(content).toContain("soul possess");
+    expect(content).toContain("soul exorcise");
     expect(content).toContain("--no-interactive");
   });
 

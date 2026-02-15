@@ -1,11 +1,12 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { homedir } from "node:os";
+import { loadConfig } from "./config.js";
 
 const SWAP_MARKER = "<!-- opensoul:swapped -->";
 
 function soulPath(): string {
-  return join(homedir(), ".openclaw", "workspace", "SOUL.md");
+  return loadConfig().soul_path;
 }
 
 function backupDir(): string {

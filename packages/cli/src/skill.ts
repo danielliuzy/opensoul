@@ -1,11 +1,11 @@
 import { writeFileSync, mkdirSync, existsSync, rmSync } from "node:fs";
 import { join } from "node:path";
-import { homedir } from "node:os";
+import { loadConfig } from "./config.js";
 
 const SKILL_DIR_NAME = "opensoul";
 
 function skillsDir(): string {
-  return join(homedir(), ".openclaw", "skills");
+  return loadConfig().skills_path;
 }
 
 function skillDir(): string {
@@ -49,21 +49,21 @@ description: Search, browse, and swap bot personality (SOUL.md) files from the S
 metadata: {"openclaw":{"requires":{"bins":["soul"]},"primaryEnv":null},"install":[{"id":"npm","kind":"node","package":"opensoul","bins":["soul"],"label":"Install via npm"}]}
 ---
 
-You can manage the bot's personality by swapping SOUL.md files from the Soul.MD registry.
+You can manage the bot's personality by swapping SOUL.md files from the OpenSoul registry.
 
 ## Available actions
 
-### Swap soul
+### Possess — swap soul
 When the user asks to change personality/soul:
 1. Search for it: \`soul search <query> --no-interactive\`
-2. Pull it from the registry: \`soul pull <slug>\`
-3. Swap it in: \`soul swap <name> --yes\`
+2. Summon it from the registry: \`soul summon <slug>\`
+3. Possess your bot: \`soul possess <name> --yes\`
 
 ### Check current soul
 Run \`soul status\` to see what soul is currently loaded.
 
-### Rollback
-If the user wants to go back to their original personality: \`soul rollback\`
+### Exorcise — restore original
+If the user wants to go back to their original personality: \`soul exorcise\`
 
 ### Browse souls
 To show available souls: \`soul search --top --no-interactive\` or \`soul search <query> --no-interactive\`
@@ -74,7 +74,7 @@ To show locally cached souls: \`soul list\`
 ## Important notes
 
 - Always use \`--no-interactive\` with \`soul search\` since you cannot use interactive TUI controls.
-- Always use \`--yes\` with \`soul swap\` to skip the confirmation prompt.
-- After swapping a soul, let the user know they can use \`soul rollback\` to restore their original personality.
+- Always use \`--yes\` with \`soul possess\` to skip the confirmation prompt.
+- After possessing a soul, let the user know they can use \`soul exorcise\` to restore their original personality.
 - The soul takes effect on the next conversation — the current conversation is not affected.
 `;

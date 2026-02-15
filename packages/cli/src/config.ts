@@ -4,20 +4,16 @@ import { homedir } from "node:os";
 import { parse, stringify } from "yaml";
 
 export interface SoulConfig {
-  default_bot: string;
-  auth_token: string;
-  cache_dir: string;
-  swap_mode: "immediate" | "confirm";
   registry_url: string;
+  soul_path: string;
+  skills_path: string;
 }
 
 function defaultConfig(): SoulConfig {
   return {
-    default_bot: "http://localhost:4000",
-    auth_token: "dev-token",
-    cache_dir: join(homedir(), ".soul", "cache"),
-    swap_mode: "immediate",
     registry_url: "https://opensoul-api.zyliu-daniel.workers.dev",
+    soul_path: join(homedir(), ".openclaw", "workspace", "SOUL.md"),
+    skills_path: join(homedir(), ".openclaw", "skills"),
   };
 }
 

@@ -80,9 +80,11 @@ export function soulRoutes(db: Client, storage: StorageInterface) {
 
     let orderClause = " ORDER BY s.updated_at DESC";
     if (sort === "top") {
-      orderClause = " ORDER BY s.rating_avg DESC, s.rating_count DESC";
+      // Weighted score: rating quality + engagement + popularity
+      // log1p smooths download/rating counts so outliers don't dominate
+      orderClause = " ORDER BY (s.rating_avg * 0.5 + LOG(1 + s.rating_count) * 0.3 + LOG(1 + s.downloads_count) * 0.2) DESC";
     } else if (sort === "popular") {
-      orderClause = " ORDER BY s.rating_count DESC, s.rating_avg DESC";
+      orderClause = " ORDER BY s.downloads_count DESC, s.rating_count DESC";
     }
 
     const countResult = await db.execute({

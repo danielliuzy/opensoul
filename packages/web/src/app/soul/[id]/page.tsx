@@ -305,6 +305,33 @@ export default function SoulDetailPage() {
               </div>
             )}
 
+            <div>
+              <span className="text-xs text-text-muted uppercase tracking-wide font-sans">
+                Install via CLI
+              </span>
+              <div className="relative mt-1">
+                <code className="block text-sm bg-bg-input border border-border rounded px-3 py-2 pr-9 text-accent">
+                  soul possess {soul.label}
+                </code>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(`soul possess ${soul.label}`);
+                    setCliCopied(true);
+                    setTimeout(() => setCliCopied(false), 2000);
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-text-muted hover:text-text transition-colors"
+                  title="Copy to clipboard"
+                >
+                  {cliCopied ? (
+                    <Check size={14} className="text-accent" />
+                  ) : (
+                    <Copy size={14} />
+                  )}
+                </button>
+              </div>
+            </div>
+
             {/* Description */}
             {editing === "desc" ? (
               <div className="space-y-2">
@@ -413,32 +440,6 @@ export default function SoulDetailPage() {
                 </div>
               </div>
             )}
-            <div>
-              <span className="text-xs text-text-muted uppercase tracking-wide font-sans">
-                Install via CLI
-              </span>
-              <div className="relative mt-1">
-                <code className="block text-sm bg-bg-input border border-border rounded px-3 py-2 pr-9 text-accent">
-                  soul pull {soul.label}
-                </code>
-                <button
-                  type="button"
-                  onClick={() => {
-                    navigator.clipboard.writeText(`soul pull ${soul.label}`);
-                    setCliCopied(true);
-                    setTimeout(() => setCliCopied(false), 2000);
-                  }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-text-muted hover:text-text transition-colors"
-                  title="Copy to clipboard"
-                >
-                  {cliCopied ? (
-                    <Check size={14} className="text-accent" />
-                  ) : (
-                    <Copy size={14} />
-                  )}
-                </button>
-              </div>
-            </div>
             <p className="text-xs text-text-muted">
               Updated: {new Date(soul.updated_at.endsWith("Z") ? soul.updated_at : soul.updated_at + "Z").toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short", hour12: true })}
             </p>
