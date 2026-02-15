@@ -74,4 +74,9 @@ export class RegistryClient {
 
     return res.text();
   }
+
+  async trackDownload(id: string): Promise<void> {
+    const url = `${this.baseUrl}/api/v1/souls/${id}/download`;
+    await fetch(url, { method: "POST" }).catch(() => {});
+  }
 }

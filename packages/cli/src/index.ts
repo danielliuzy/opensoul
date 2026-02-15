@@ -149,6 +149,7 @@ program
             const hash = createHash("sha256").update(content).digest("hex");
             const name = meta.name;
             cacheSoul(name, content, hash, meta.label);
+            client.trackDownload(label);
             soulName = name;
             source = `registry:${meta.label}`;
             s.stop(
@@ -362,6 +363,7 @@ program
         const hash = createHash("sha256").update(content).digest("hex");
         const name = meta.name;
         cacheSoul(name, content, hash, meta.label);
+        client.trackDownload(label);
         console.log(
           pc.green(`🔮 Summoned ${pc.yellow(pc.bold(name))} (${label})`),
         );
@@ -417,6 +419,7 @@ program
       const name = meta.name;
 
       cacheSoul(name, content, hash, meta.label);
+      client.trackDownload(label);
 
       console.log(
         pc.green(`\n🔮 Summoned ${pc.yellow(pc.bold(name))} (${label})`),

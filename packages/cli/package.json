@@ -1,6 +1,6 @@
 {
   "name": "opensoul",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Swappable bot personality files — search, pull, and swap SOUL.md files from the Soul.MD registry",
   "type": "module",
   "license": "MIT",
