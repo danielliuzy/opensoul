@@ -16,6 +16,7 @@ export interface Env {
   JWT_SECRET: string;
   WEB_APP_URL?: string;
   OPENAI_API_KEY: string;
+  ANTHROPIC_API_KEY: string;
   FAL_KEY: string;
 }
 
@@ -31,6 +32,7 @@ export default {
       JWT_SECRET: env.JWT_SECRET,
       WEB_APP_URL: env.WEB_APP_URL,
       OPENAI_API_KEY: env.OPENAI_API_KEY,
+      ANTHROPIC_API_KEY: env.ANTHROPIC_API_KEY,
       FAL_KEY: env.FAL_KEY,
     });
 
