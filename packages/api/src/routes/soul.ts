@@ -2,9 +2,6 @@ import { Hono } from "hono";
 import type { Client } from "@libsql/client";
 import { createHash } from "node:crypto";
 import { nanoid } from "nanoid";
-import { generateObject } from "ai";
-import { openai } from "@ai-sdk/openai";
-import { z } from "zod";
 import type { StorageInterface } from "../storage/local.js";
 import type { SoulWithAuthor } from "../storage/sqlite.js";
 import { generateLabel } from "../storage/sqlite.js";
@@ -26,23 +23,36 @@ function fallbackName(content: string): string {
 
 async function summarize(content: string): Promise<{ name: string; description: string }> {
   try {
-    const { object } = await generateObject({
-      model: openai("gpt-4o-mini"),
-      schema: z.object({
-        name: z
-          .string()
-          .describe(
-            "A short, memorable name for this persona (2-4 words, title case). Examples: 'Gentle Presence', 'Chaos Goblin', 'Senior TypeScript Engineer'",
-          ),
-        description: z
-          .string()
-          .describe(
-            "A single sentence summary of this persona, max 80 characters. Be punchy and specific, not generic.",
-          ),
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content:
+              'You analyze AI persona definitions. Respond with JSON: {"name": "short memorable name, 2-4 words, title case", "description": "single sentence summary, max 80 chars, punchy and specific"}',
+          },
+          {
+            role: "user",
+            content,
+          },
+        ],
       }),
-      prompt: `You are analyzing a personality/persona definition for an AI assistant. Generate a short name and description that capture the essence of this persona.\n\n${content}`,
     });
-    return object;
+    const data = (await res.json()) as {
+      choices: { message: { content: string } }[];
+    };
+    const parsed = JSON.parse(data.choices[0].message.content) as {
+      name: string;
+      description: string;
+    };
+    return { name: parsed.name, description: parsed.description };
   } catch {
     return { name: fallbackName(content), description: "" };
   }
