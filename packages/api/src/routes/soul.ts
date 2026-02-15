@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import type { Client } from "@libsql/client";
 import { createHash } from "node:crypto";
 import { nanoid } from "nanoid";
@@ -119,7 +120,7 @@ _[Closing one-liner in italics — a memorable sign-off that encapsulates the wh
 - The tone of the document itself should match the soul it describes (a chaos goblin's file should be energetic, a philosopher's should be reflective)
 - Keep it concise — the whole file should be 300-500 words, dense with personality`;
 
-function streamGenerateSoul(prompt: string): Response {
+function streamGenerateSoul(c: Context, prompt: string): Response {
   const upstream = fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -177,13 +178,10 @@ function streamGenerateSoul(prompt: string): Response {
     await writer.close();
   });
 
-  return new Response(readable, {
-    headers: {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache",
-      Connection: "keep-alive",
-    },
-  });
+  c.header("Content-Type", "text/event-stream");
+  c.header("Cache-Control", "no-cache");
+  c.header("Connection", "keep-alive");
+  return c.body(readable);
 }
 
 export function soulRoutes(db: Client, storage: StorageInterface) {
@@ -198,7 +196,7 @@ export function soulRoutes(db: Client, storage: StorageInterface) {
     if (body.prompt.length > 2000) {
       return c.json({ error: "Prompt must be under 2000 characters" }, 400);
     }
-    return streamGenerateSoul(body.prompt);
+    return streamGenerateSoul(c, body.prompt);
   });
 
   // List/search souls (public)
