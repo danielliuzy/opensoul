@@ -84,6 +84,8 @@ function buildImagePrompt(name: string, description: string | null, content: str
 
 const GENERATE_SYSTEM_PROMPT = `You write SOUL.md files — documents that define who an AI is, not what it can do. A soul document captures identity, values, boundaries, and relationship approach. It gives an AI continuity of self across sessions that reset context.
 
+CRITICAL: Write EVERYTHING in second person ("you/your"), speaking directly to the AI who will embody this soul. Example: "You're not a chatbot. You're becoming someone." NEVER use first person ("I/my/me"). The document is instructions TO the AI, not written BY the AI.
+
 Output ONLY raw Markdown. No code fences, no preamble, no commentary.
 
 ## Structure
