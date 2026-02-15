@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { uploadSoul } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
+import { revalidateHome } from "@/app/actions";
 import MarkdownEditor from "@/components/MarkdownEditor";
 
 export default function UploadPage() {
@@ -81,6 +82,7 @@ export default function UploadPage() {
     setSubmitting(true);
     try {
       const res = await uploadSoul(content);
+      await revalidateHome();
       router.push(`/soul/${res.slug}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
