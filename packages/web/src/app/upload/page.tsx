@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { uploadSoul } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
@@ -54,22 +54,14 @@ export default function UploadPage() {
     setDragging(false);
   };
 
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/login");
+    }
+  }, [isLoading, user, router]);
+
   if (!isLoading && !user) {
-    return (
-      <div className="text-center py-16">
-        <h1 className="text-2xl font-bold mb-4">Login Required</h1>
-        <p className="text-text-muted mb-6">
-          You need to be logged in to upload a{" "}
-          <span className="text-accent">SOUL</span>.md.
-        </p>
-        <a
-          href="/login"
-          className="bg-accent hover:bg-accent-hover text-white px-6 py-2.5 rounded-md font-medium transition-colors"
-        >
-          Login with GitHub
-        </a>
-      </div>
-    );
+    return null;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

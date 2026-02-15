@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useAuth } from "@/lib/auth";
 import { useTheme } from "@/lib/theme";
 import { getLoginUrl } from "@/lib/api";
-import { Sun, Moon } from "lucide-react";
+import { Sun, Moon, LogOut, Github, Home } from "lucide-react";
 
 export default function Navbar() {
   const { user, logout, isLoading } = useAuth();
@@ -15,8 +15,15 @@ export default function Navbar() {
     <nav className="border-b border-border sticky top-0 z-50 bg-bg/80 backdrop-blur-md">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <Link href="/" className="text-lg font-semibold font-serif">
+          <Link href="/" className="text-lg font-semibold font-serif hidden sm:block">
             Open<span className="text-accent">SOUL</span>.md
+          </Link>
+          <Link
+            href="/"
+            className="text-text-muted hover:text-text transition-colors sm:hidden"
+            title="Home"
+          >
+            <Home size={18} />
           </Link>
           <Link
             href="/browse"
@@ -51,21 +58,23 @@ export default function Navbar() {
                   height={32}
                   className="rounded-full"
                 />
-                <span className="text-sm text-text-muted">{user.username}</span>
+                <span className="text-sm text-text-muted hidden sm:inline">{user.username}</span>
               </Link>
               <button
                 onClick={logout}
-                className="text-xs text-text-muted hover:text-text transition-colors"
+                className="text-text-muted hover:text-text transition-colors p-1.5 rounded-md hover:bg-bg-hover"
+                title="Logout"
               >
-                Logout
+                <LogOut size={16} />
               </button>
             </div>
           ) : (
             <a
               href={getLoginUrl()}
-              className="text-sm bg-accent hover:bg-accent-hover text-white px-4 py-1.5 rounded-md transition-colors"
+              className="flex items-center gap-1.5 text-sm bg-accent hover:bg-accent-hover text-white px-3 py-1.5 rounded-md transition-colors"
             >
-              Login with GitHub
+              <Github size={16} />
+              <span className="hidden sm:inline">Login</span>
             </a>
           )}
         </div>
