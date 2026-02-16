@@ -10,6 +10,8 @@ OpenSOUL.md is a registry of AI personality files ([SOUL.md](https://soul.md)). 
 
 A [SOUL.md](https://soul.md) file defines _who_ your agent is, not what it can do. Values, boundaries, communication style, how it handles the existential reality of waking up with no memory every session. Think of it as a personality config that actually has personality.
 
+Visit [soul.md](https://soul.md) to learn more about the spec and the philosophy behind it.
+
 ## 🚀 Quick Start
 
 ### 👀 Just want to browse?
@@ -36,7 +38,7 @@ soul possess chaos-goblin  # your AI is now a chaos goblin
 soul exorcise              # undo the possession, restore the original
 ```
 
-## 🐾 Using with OpenClaw
+## 🦞 Using with OpenClaw
 
 ```bash
 soul install
