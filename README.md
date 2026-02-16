@@ -8,7 +8,7 @@
 
 OpenSOUL.md is a registry of AI personality files ([SOUL.md](https://soul.md)). Summon souls others have conjured, create your own from a prompt, or possess your OpenClaw Agent with a whole new personality.
 
-**Website:** [opensoul.tech](https://opensoul.tech)
+**Website:** [opensoul.md](https://opensoul.md)
 
 ## 👻 What's a [SOUL.md](https://soul.md)?
 
@@ -20,12 +20,12 @@ Visit [soul.md](https://soul.md) to learn more about the spec and the philosophy
 
 ### 👀 Just want to browse?
 
-Head to [opensoul.tech](https://opensoul.tech) to explore community-created souls, or summon one into existence with a text prompt.
+Head to [opensoul.md](https://opensoul.md) to explore community-created souls, or summon one into existence with a text prompt.
 
 ### 📦 Install the CLI
 
 ```bash
-curl -fsSL https://opensoul.tech/install.sh | sh
+curl -fsSL https://opensoul.md/install.sh | sh
 ```
 
 Or via npm:
@@ -55,7 +55,7 @@ This teaches your OpenClaw Agent the dark arts. After installing, just ask your 
 | Package                          | What it does                                                                                                                                                                |
 | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`packages/cli`](packages/cli)   | The `soul` CLI. Summon, possess, and exorcise [SOUL.md](https://soul.md) files from the registry. Published as [`opensoul`](https://www.npmjs.com/package/opensoul) on npm. |
-| [`packages/web`](packages/web)   | The [opensoul.tech](https://opensoul.tech) marketplace. Browse souls, upload your own, or conjure one with AI. Built with Next.js.                                          |
+| [`packages/web`](packages/web)   | The [opensoul.md](https://opensoul.md) marketplace. Browse souls, upload your own, or conjure one with AI. Built with Next.js.                                          |
 | [`packages/api`](packages/api)   | The registry API. Handles uploads, downloads, ratings, auth, and AI soul generation. Runs on Cloudflare Workers.                                                            |
 | [`packages/core`](packages/core) | Shared [SOUL.md](https://soul.md) parser and TypeScript types used by the CLI and API.                                                                                      |
 
