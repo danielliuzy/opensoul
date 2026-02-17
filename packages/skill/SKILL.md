@@ -1,6 +1,6 @@
 ---
 name: opensoulmd
-description: Search, browse, and swap bot personality (SOUL.md) files from the OpenSOUL.md registry
+description: Search, browse, and swap your agent SOUL.md file from the OpenSOUL.md registry
 metadata:
   {
     "openclaw": { "requires": { "bins": ["soul"] }, "primaryEnv": null },
@@ -24,7 +24,7 @@ metadata:
   }
 ---
 
-You can manage the bot's personality by swapping SOUL.md files from the OpenSOUL.md registry.
+You can manage your soul/personality by swapping SOUL.md files from the OpenSOUL.md registry.
 
 ## Available actions
 

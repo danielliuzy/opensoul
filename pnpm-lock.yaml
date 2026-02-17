@@ -82,6 +82,9 @@ importers:
       '@types/node':
         specifier: ^22.0.0
         version: 22.19.11
+      opensoulmd:
+        specifier: workspace:*
+        version: link:../skill
       tsx:
         specifier: ^4.19.0
         version: 4.21.0
@@ -107,6 +110,8 @@ importers:
       vitest:
         specifier: ^3.0.0
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2)
+
+  packages/skill: {}
 
   packages/web:
     dependencies:

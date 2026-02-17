@@ -26,8 +26,7 @@ function skillPath(): string {
 }
 
 function loadSkillContent(): string {
-  // SKILL.md is bundled at the package root (sibling to dist/)
-  const path = join(__dirname, "..", "SKILL.md");
+  const path = join(__dirname, "SKILL.md");
   return readFileSync(path, "utf-8");
 }
 

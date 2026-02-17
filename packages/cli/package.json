@@ -23,11 +23,10 @@
     "soul": "./dist/index.js"
   },
   "files": [
-    "dist",
-    "SKILL.md"
+    "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp node_modules/opensoulmd/SKILL.md dist/SKILL.md",
     "test": "vitest run --passWithNoTests",
     "dev": "tsx --watch src/index.ts",
     "prepublishOnly": "pnpm run build"
@@ -40,6 +39,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "opensoulmd": "workspace:*",
     "tsx": "^4.19.0",
     "typescript": "^5.7.0",
     "vitest": "^3.0.0"
