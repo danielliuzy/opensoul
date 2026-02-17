@@ -15,6 +15,11 @@ export function createApiApp(
 
   app.use("*", cors());
 
+  app.onError((err, c) => {
+    console.error(`[API Error] ${c.req.method} ${c.req.path}:`, err.message);
+    return c.json({ error: "Internal server error" }, 500);
+  });
+
   app.route("/api/v1/auth", authRoutes(db));
   app.route("/api/v1/souls", soulRoutes(db, storage));
   app.route("/api/v1/users", userRoutes(db));

@@ -100,13 +100,12 @@ export class S3Storage implements StorageInterface {
   }
 
   async getSoul(slug: string): Promise<string | null> {
-    try {
-      const res = await this.signedFetch("GET", `${slug}/soul.md`);
-      if (!res.ok) return null;
-      return await res.text();
-    } catch {
-      return null;
+    const res = await this.signedFetch("GET", `${slug}/soul.md`);
+    if (res.status === 404) return null;
+    if (!res.ok) {
+      throw new Error(`S3 GET failed (${res.status})`);
     }
+    return await res.text();
   }
 
   async deleteSoul(slug: string): Promise<void> {
@@ -123,15 +122,14 @@ export class S3Storage implements StorageInterface {
   }
 
   async getImage(slug: string, filename: string): Promise<{ data: ArrayBuffer; contentType: string } | null> {
-    try {
-      const res = await this.signedFetch("GET", `${slug}/${filename}`);
-      if (!res.ok) return null;
-      const data = await res.arrayBuffer();
-      const contentType = res.headers.get("content-type") ?? "image/png";
-      return { data, contentType };
-    } catch {
-      return null;
+    const res = await this.signedFetch("GET", `${slug}/${filename}`);
+    if (res.status === 404) return null;
+    if (!res.ok) {
+      throw new Error(`S3 GET image failed (${res.status})`);
     }
+    const data = await res.arrayBuffer();
+    const contentType = res.headers.get("content-type") ?? "image/png";
+    return { data, contentType };
   }
 
   async deleteImage(slug: string, filename: string): Promise<void> {

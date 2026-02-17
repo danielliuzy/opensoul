@@ -291,7 +291,12 @@ export function soulRoutes(db: Client, storage: StorageInterface) {
       return c.json({ error: "Soul not found" }, 404);
     }
 
-    const content = await storage.getSoul(soul.slug);
+    let content: string | null;
+    try {
+      content = await storage.getSoul(soul.slug);
+    } catch {
+      return c.json({ error: "Storage temporarily unavailable" }, 503);
+    }
     if (!content) {
       return c.json({ error: "Soul content not found" }, 404);
     }
