@@ -1,5 +1,5 @@
 ---
-name: opensoul
+name: opensoulmd
 description: Search, browse, and swap bot personality (SOUL.md) files from the OpenSOUL.md registry
 metadata:
   {
