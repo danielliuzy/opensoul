@@ -1,6 +1,6 @@
 ---
 name: opensoulmd
-description: Search, browse, and swap your agent SOUL.md file from the OpenSOUL.md registry
+description: Search, summon, and possess your agent with SOUL.md personality files from the OpenSOUL.md registry
 metadata:
   {
     "openclaw": { "requires": { "bins": ["soul"] }, "primaryEnv": null },
@@ -24,11 +24,11 @@ metadata:
   }
 ---
 
-You can manage your soul/personality by swapping SOUL.md files from the OpenSOUL.md registry.
+You can manage your agent's personality by possessing it with SOUL.md files from the OpenSOUL.md registry.
 
 ## Available actions
 
-### Possess — swap soul
+### Possess — change soul
 
 When the user asks to change personality/soul:
 
@@ -55,7 +55,7 @@ Sorting options:
 
 To show all available souls: `soul search --top --no-interactive`
 
-### Summon — download without swapping
+### Summon — download without possessing
 
 To download a soul to local cache without activating it: `soul summon <label>`
 
@@ -75,7 +75,7 @@ To remove a soul from the local cache: `soul banish <name>`
 
 To check what soul is currently loaded: `soul status`
 
-Shows the SOUL.md path, swap state (original or swapped), and backup status.
+Shows the SOUL.md path, possession state (original or possessed), and backup status.
 
 ### Path — show or set SOUL.md location
 
