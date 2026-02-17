@@ -1,6 +1,6 @@
 # opensoul
 
-CLI for [OpenSOUL.md](https://opensoul.md) — search, pull, and swap AI personality files (SOUL.md) from the registry.
+CLI for [OpenSOUL.md](https://opensoul.md) — search, summon, and possess AI personality files (SOUL.md) from the registry.
 
 ## Install
 
@@ -11,7 +11,7 @@ npm install -g opensoul
 ## Commands
 
 ```
-soul possess <name>    Swap your active SOUL.md
+soul possess <name>    Possess your agent with a new soul
 soul exorcise          Restore your original SOUL.md
 soul search <query>    Search the registry
 soul summon <name>     Download a soul to local cache
@@ -30,7 +30,7 @@ soul uninstall         Remove the skill
 # Search for a soul
 soul search pirate
 
-# Swap your bot's personality
+# Possess your bot with a new personality
 soul possess pirate
 
 # Go back to your original personality

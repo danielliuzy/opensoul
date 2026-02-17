@@ -82,7 +82,7 @@ const program = new Command();
 
 program
   .name("soul")
-  .description("OpenSoul CLI — manage swappable bot personality files")
+  .description("OpenSoul CLI — possess your AI agent with SOUL.md personality files")
   .version(pkg.version, "-v, --version")
   .option("--verbose", "Enable verbose output for debugging")
   .hook("preAction", () => {
@@ -92,8 +92,8 @@ program
 // --- possess ---
 program
   .command("possess <pathOrName>")
-  .description("Swap your bot's SOUL.md with a soul file or cached soul")
-  .option("--dry-run", "Preview the swap without writing anything")
+  .description("Possess your bot with a soul file or cached soul")
+  .option("--dry-run", "Preview the possession without writing anything")
   .option("-y, --yes", "Skip confirmation prompt")
   .action(
     async (pathOrName: string, opts: { dryRun?: boolean; yes?: boolean }) => {
@@ -500,7 +500,7 @@ program
 // --- status ---
 program
   .command("status")
-  .description("Show current SOUL.md status and swap state")
+  .description("Show current SOUL.md status and possession state")
   .action(() => {
     const soulPath = getSoulPath();
     const wsDir = dirname(soulPath);
@@ -523,7 +523,7 @@ program
     console.log(pc.bold("\nSOUL.md Status"));
     console.log(`Path: ${soulPath}`);
     console.log(
-      `State: ${swapped ? pc.cyan("swapped") : pc.green("original")}`,
+      `State: ${swapped ? pc.cyan("possessed") : pc.green("original")}`,
     );
     console.log(`Backup: ${hasBackup() ? pc.green("saved") : pc.dim("none")}`);
 
@@ -564,7 +564,7 @@ program
     }
     console.log(pc.dim(`  ${path}`));
     console.log(
-      pc.dim(`  Your OpenClaw bot can now swap souls via natural language.`),
+      pc.dim(`  Your OpenClaw bot can now possess souls via natural language.`),
     );
   });
 
