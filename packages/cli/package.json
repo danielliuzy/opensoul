@@ -1,6 +1,6 @@
 {
   "name": "opensoul",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Possess your AI agent — search, summon, and possess SOUL.md personality files from the OpenSOUL.md registry",
   "type": "module",
   "license": "MIT",
