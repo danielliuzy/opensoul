@@ -9,6 +9,14 @@ import type {
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/api/v1";
 
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
 function getToken(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem("opensoul_token");
@@ -35,7 +43,8 @@ async function apiFetch<T>(
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }));
-    throw new Error(err.error ?? `API error ${res.status}`);
+    const error = new ApiError(err.error ?? `API error ${res.status}`, res.status);
+    throw error;
   }
 
   const contentType = res.headers.get("content-type") ?? "";

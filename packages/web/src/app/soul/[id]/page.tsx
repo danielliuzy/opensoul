@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { getSoul, getSoulContent, getSoulImageUrl, rateSoul, updateSoul, updateSoulContent, deleteSoul } from "@/lib/api";
+import { getSoul, getSoulContent, getSoulImageUrl, rateSoul, updateSoul, updateSoulContent, deleteSoul, ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import type { SoulDetailResponse } from "@/lib/types";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
@@ -38,13 +38,23 @@ export default function SoulDetailPage() {
   const [imageVersion, setImageVersion] = useState(() => Date.now());
   const [showLightbox, setShowLightbox] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const [error, setError] = useState(false);
 
   const isOwner = !!(user && soul && soul.user_id === user.id);
 
   useEffect(() => {
     if (!params.id) return;
-    getSoul(params.id).then(setSoul).catch(() => setNotFound(true));
-    getSoulContent(params.id).then(setContent).catch(() => {});
+    getSoul(params.id)
+      .then(setSoul)
+      .catch((err) => {
+        if (err instanceof ApiError && err.status === 404) setNotFound(true);
+        else setError(true);
+      });
+    getSoulContent(params.id)
+      .then(setContent)
+      .catch((err) => {
+        if (!(err instanceof ApiError && err.status === 404)) setError(true);
+      });
   }, [params.id]);
 
   const handleRate = async (rating: number) => {
@@ -101,6 +111,23 @@ export default function SoulDetailPage() {
       setSaving(false);
     }
   };
+
+  if (error && !soul) {
+    return (
+      <div className="flex flex-col items-center justify-center py-32 text-center">
+        <p className="text-text-muted text-lg mb-6">
+          Something went wrong loading this soul.
+        </p>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-md shadow-accent/20"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   if (notFound) {
     return (
